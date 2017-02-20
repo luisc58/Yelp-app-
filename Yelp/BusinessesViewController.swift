@@ -7,80 +7,96 @@
 //
 
 import UIKit
+import MBProgressHUD
 
-class BusinessesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+struct MyVariables {
+    static var latitud = 0.0
+    static var longitud = 0.0
+    static var latitudes: [Double] = []
+    static var longitudes: [Double] = []
+    static var names: [String] = []
+    static var urls: [String] = []
+    static var mapUrl: String!
+}
+
+class BusinessesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate, UIScrollViewDelegate{
     
+    @IBOutlet weak var webView: UIWebView!
     @IBOutlet weak var tableView: UITableView!
-    
+    var isMoreDataLoading = false
     var businesses: [Business]!
+    var searchTxt : String!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        //Setup searchbar
+        let searchBar = UISearchBar()
         
+        searchBar.delegate = self
+        searchBar.placeholder = "Restaurants"
+        searchBar.sizeToFit()
+        navigationItem.titleView = searchBar
         
-        Business.searchWithTerm(term: "Thai", completion: { (businesses: [Business]?, error: Error?) -> Void in
+        //set custom bar button
+        let button = UIButton.init(type: .custom)
+        button.setImage(UIImage(named: "map"), for: UIControlState.normal)
+        button.addTarget(self, action: #selector(tapped), for: UIControlEvents.touchDown)
+        button.frame = CGRect(x: 0, y : 0, width : 80, height : 55)
+        let barButton = UIBarButtonItem(customView: button)
+        self.navigationItem.rightBarButtonItem = barButton
+        
+        Business.searchWithTerm(term: "Mexican", completion: { (businesses: [Business]?, error: Error?) -> Void in
             
             self.businesses = businesses
             self.tableView.reloadData()
             if let businesses = businesses {
                 for business in businesses {
-                    print(business.name!)
-                    print(business.address!)
+                    MyVariables.latitudes.append(business.latitude!)
+                    MyVariables.longitudes.append(business.longitude!)
+                    MyVariables.names.append(business.name!)
+                    MyVariables.urls.append(business.webUrl!)
                 }
             }
-            
-            }
-        )
-        
-        /* Example of Yelp search with more search options specified
-         Business.searchWithTerm("Restaurants", sort: .Distance, categories: ["asianfusion", "burgers"], deals: true) { (businesses: [Business]!, error: NSError!) -> Void in
-         self.businesses = businesses
-         
-         for business in businesses {
-         print(business.name!)
-         print(business.address!)
-         }
-         }
-         */
-        
+        })
     }
     
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        Business.searchWithTerm(term: searchText,  completion: { (businesses: [Business]?, error: Error?) -> Void in
+            self.businesses = businesses
+            self.searchTxt = searchText
+            self.tableView.reloadData()
+            if let businesses = businesses {
+                for business in businesses {
+                    
+                    MyVariables.latitudes.append(business.latitude!)
+                    MyVariables.longitudes.append(business.longitude!)
+                    MyVariables.names.append(business.name!)
+                    MyVariables.urls.append(business.webUrl!)
+                }
+            }}
+        )}
     
-    public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return businesses?.count ?? 0
-    }
+    
+    func tapped() { performSegue(withIdentifier: "map", sender: nil) }
+    
+    public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {return businesses?.count ?? 0}
     
     
-    // Row display. Implementers should *always* try to reuse cells by setting each cell's reuseIdentifier and querying for available reusable cells with dequeueReusableCellWithIdentifier:
-    // Cell gets various attributes set automatically based on table (separators) and data source (accessory views, editing controls)
-    
-  
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    
         let cell = tableView.dequeueReusableCell(withIdentifier: "businessCell", for: indexPath) as! businessCell
-        
         cell.business = businesses[indexPath.row]
-        
         return cell
     }
     
-
     
-    
-      override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let myWebView = self.storyboard?.instantiateViewController(withIdentifier: "LinkViewController") as! webViewControl
+        myWebView.url = NSURL(string:  MyVariables.urls[indexPath.row])! as URL
+       MBProgressHUD.showAdded(to: self.view, animated: true)
+        self.present(myWebView, animated: true, completion: nil)
+         
     }
-    
-    /*
-     // MARK: - Navigation
-     
-     // In a storyboard-based application, you will often want to do a little preparation before navigation
-     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-     // Get the new view controller using segue.destinationViewController.
-     // Pass the selected object to the new view controller.
-     }
-     */
-    
+   
+
 }

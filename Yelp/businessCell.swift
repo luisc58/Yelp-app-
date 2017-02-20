@@ -40,7 +40,10 @@ class businessCell: UITableViewCell {
     
     override func awakeFromNib() {
         super.awakeFromNib()
-        // Initialization code
+        
+        thumbImageView.layer.cornerRadius = 7.0
+        thumbImageView.clipsToBounds = true
+        
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {

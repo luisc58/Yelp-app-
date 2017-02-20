@@ -16,6 +16,9 @@ class Business: NSObject {
     let distance: String?
     let ratingImageURL: URL?
     let reviewCount: NSNumber?
+    let latitude : Double?
+    let longitude: Double?
+    var webUrl: String?
     
     init(dictionary: NSDictionary) {
         name = dictionary["name"] as? String
@@ -27,13 +30,17 @@ class Business: NSObject {
             imageURL = nil
         }
         
-        let location = dictionary["location"] as? NSDictionary
-        var address = ""
+        let location = dictionary["location"] as? NSDictionary //inside a dictionary
+        
+        var address = "", latitude = 0.0, longitude = 0.0
+        
+        
         if location != nil {
             let addressArray = location!["address"] as? NSArray
             if addressArray != nil && addressArray!.count > 0 {
                 address = addressArray![0] as! String
             }
+        
             
             let neighborhoods = location!["neighborhoods"] as? NSArray
             if neighborhoods != nil && neighborhoods!.count > 0 {
@@ -42,8 +49,15 @@ class Business: NSObject {
                 }
                 address += neighborhoods![0] as! String
             }
+            //created values for coordinate
+            latitude = location!.value(forKeyPath: "coordinate.latitude") as! Double
+            longitude = location!.value(forKeyPath: "coordinate.longitude") as! Double
+            
+            
         }
         self.address = address
+        self.longitude = longitude
+        self.latitude = latitude
         
         let categoriesArray = dictionary["categories"] as? [[String]]
         if categoriesArray != nil {
@@ -64,7 +78,15 @@ class Business: NSObject {
         } else {
             distance = nil
         }
-        
+       let  webUrls = dictionary["mobile_url"] as? String 
+       
+        if webUrls != nil {
+            webUrl = webUrls
+        } else {
+            webUrl = nil
+        }
+
+                      
         let ratingImageURLString = dictionary["rating_img_url_large"] as? String
         if ratingImageURLString != nil {
             ratingImageURL = URL(string: ratingImageURLString!)
@@ -88,7 +110,10 @@ class Business: NSObject {
         _ = YelpClient.sharedInstance.searchWithTerm(term, completion: completion)
     }
     
+    
+    
     class func searchWithTerm(term: String, sort: YelpSortMode?, categories: [String]?, deals: Bool?, completion: @escaping ([Business]?, Error?) -> Void) -> Void {
         _ = YelpClient.sharedInstance.searchWithTerm(term, sort: sort, categories: categories, deals: deals, completion: completion)
     }
-}
+    
+   }

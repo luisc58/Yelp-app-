@@ -23,15 +23,24 @@ PODS:
   - BDBOAuth1Manager (1.6.0):
     - AFNetworking/NSURLConnection (~> 2.6.0)
     - AFNetworking/NSURLSession (~> 2.6.0)
+  - EZLoadingActivity (1.01)
+  - MBProgressHUD (1.0.0)
+  - SwiftLint (0.16.1)
 
 DEPENDENCIES:
   - AFNetworking (~> 2.5)
   - BDBOAuth1Manager
+  - EZLoadingActivity
+  - MBProgressHUD
+  - SwiftLint
 
 SPEC CHECKSUMS:
   AFNetworking: cb8d14a848e831097108418f5d49217339d4eb60
   BDBOAuth1Manager: cd5a5872f355ca38180d52ca2dd844f0b0c84797
+  EZLoadingActivity: edd7e387e5197b116ce2cccb3fd747ababc2a510
+  MBProgressHUD: 4890f671c94e8a0f3cf959aa731e9de2f036d71a
+  SwiftLint: b8b683208cc09640898f16318a7a452274e91f61
 
-PODFILE CHECKSUM: e93d023552e6cb9e3bc0b66e42e1d29f24efef97
+PODFILE CHECKSUM: 646140858b269d81eff410bcbf33da96edb4d696
 
-COCOAPODS: 1.0.1
+COCOAPODS: 1.2.0
